@@ -50,7 +50,7 @@ public class ANN
 
         inputs = new List<double>(inputValues);
 
-        for (int i = 0; i < numHidden + 1; i++)
+        for (int i = 0; i < numHidden + 1; i++) //i is looping through layers
         {
             if(i > 0)
             {
@@ -58,12 +58,12 @@ public class ANN
             }
             outputs.Clear();
 
-            for(int j =0; j < layers[i].numNeurons; j++)
+            for(int j =0; j < layers[i].numNeurons; j++) //j is looping through neurons in each layers
             {
                 double N = 0;
                 layers[i].neurons[j].inputs.Clear();
 
-                for(int k = 0; k < layers[i].neurons[j].numInputs; k++)
+                for(int k = 0; k < layers[i].neurons[j].numInputs; k++) //k is looping through inputs of each neuron
                 {
                     layers[i].neurons[j].inputs.Add(inputs[k]);
                     N += layers[i].neurons[j].weights[k] * inputs[k]; //* ki jagha + hoskta hai
@@ -78,5 +78,68 @@ public class ANN
         UpdateWeights(outputs, desiredOutput);
 
         return outputs;
+    }
+
+    void UpdateWeights(List<double> outputs, List<double> desiredOutput)
+    {
+        double error;
+        for (int i = numHidden; i >= 0; i--) //reverse loop = back propagation part
+        {
+            for(int j = 0; j < layers[i].numNeurons; j++)
+            {
+                if (i == numHidden)
+                {
+                    error = desiredOutput[j] - outputs[j];
+                    //calculations for how much a neuron is responsible for total error
+                    layers[i].neurons[j].errorGradient = outputs[j] * (1 - outputs[j]) * error;
+                }
+                else
+                {
+                    layers[i].neurons[j].errorGradient = layers[i].neurons[j].output * (1 - layers[i].neurons[j].output);
+                    double errorGradSum = 0;
+
+                    for(int p = 0; p < layers[i+1].numNeurons; p++)
+                    {
+                        errorGradSum += layers[i + 1].neurons[p].errorGradient * layers[i + 1].neurons[p].weights[j];
+                    }
+                    layers[i].neurons[j].errorGradient += errorGradSum;
+                }
+
+                for(int k = 0; k < layers[i].neurons[j].numInputs; k++)
+                {
+                    if(i == numHidden)
+                    {
+                        error = desiredOutput[j] - outputs[j];
+                        layers[i].neurons[j].weights[k] += alpha * layers[i].neurons[j].inputs[k] * error;
+                    }
+                    else
+                    {
+                        layers[i].neurons[j].weights[k] += alpha * layers[i].neurons[j].inputs[k] * layers[i].neurons[j].errorGradient;
+
+                    }
+                }
+
+                layers[i].neurons[j].bias += alpha * -1 * layers[i].neurons[j].errorGradient;
+            }
+        }
+    }
+
+    double ActivationFunction(double value)
+    {
+        return Sigmoid(value);
+    }
+
+    //(aka binary step)
+    double Step(double value) //type of activation function
+    {
+        if (value < 0) return 0;
+        else return 1;
+    }
+
+    //(aka logistic softstep)
+    double Sigmoid(double value) //type of activation function
+    {
+        double k = (double)System.Math.Exp(value);
+        return k / (1.0f + k);
     }
 }
