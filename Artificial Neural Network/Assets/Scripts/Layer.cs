@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Layer : MonoBehaviour
+public class Layer
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public int numNeurons;
+    public List<Neuron> neurons = new List<Neuron>();
 
-    // Update is called once per frame
-    void Update()
+    public Layer(int nNeuron, int numNeuronInputs)
     {
-        
+        numNeurons = nNeuron;
+        for(int i = 0; i< nNeuron; i++)
+        {
+            neurons.Add(new Neuron(numNeuronInputs));
+        }
     }
 }
