@@ -66,7 +66,7 @@ public class ANN
                 for(int k = 0; k < layers[i].neurons[j].numInputs; k++) //k is looping through inputs of each neuron
                 {
                     layers[i].neurons[j].inputs.Add(inputs[k]);
-                    N += layers[i].neurons[j].weights[k] * inputs[k]; //* ki jagha + hoskta hai
+                    N += layers[i].neurons[j].weights[k] * inputs[k];
                 }
 
                 N -= layers[i].neurons[j].bias;
@@ -102,7 +102,7 @@ public class ANN
                     {
                         errorGradSum += layers[i + 1].neurons[p].errorGradient * layers[i + 1].neurons[p].weights[j];
                     }
-                    layers[i].neurons[j].errorGradient += errorGradSum;
+                    layers[i].neurons[j].errorGradient *= errorGradSum;
                 }
 
                 for(int k = 0; k < layers[i].neurons[j].numInputs; k++)
